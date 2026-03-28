@@ -1,0 +1,52 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Android
+android/local.properties
+android/.gradle/
+android/captures/
+android/app/debug
+android/app/profile
+android/app/release
+android/key.properties
+
+# iOS
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
+*.xcworkspace
+Podfile.lock
+
+# Gradle
+*.lock
+.gradle/
+
+# Generated
+lib/models/*.g.dart
+!lib/models/movie_model.g.dart
+
+# Env / secrets
+.env
+*.key
+google-services.json
+GoogleService-Info.plist

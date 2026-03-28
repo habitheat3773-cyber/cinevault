@@ -1,0 +1,78 @@
+name: Build CineVault APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Manual trigger from GitHub UI
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Get dependencies
+        run: flutter pub get
+
+      - name: 🔧 Generate Hive adapters
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: 🏗️ Build APK (Release)
+        run: flutter build apk --release --split-per-abi
+
+      - name: 🏗️ Build APK (Single universal)
+        run: flutter build apk --release
+
+      - name: 📤 Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CineVault-APK
+          path: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: 🚀 Create GitHub Release
+        if: startsWith(github.ref, 'refs/heads/main')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: CineVault v${{ github.run_number }}
+          body: |
+            ## CineVault APK
+            
+            Download the APK for your device:
+            - **arm64-v8a** → Most modern Android phones (recommended)
+            - **armeabi-v7a** → Older Android phones
+            - **app-release.apk** → Universal (works on all devices, larger file)
+            
+            ### Install Steps:
+            1. Download the APK
+            2. Enable "Install from unknown sources" in Android settings
+            3. Open the APK to install
+            4. Get your free TMDB API key from https://www.themoviedb.org/settings/api
+            5. Enter it in Settings → About → API Key
+          files: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
